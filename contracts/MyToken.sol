@@ -37,7 +37,7 @@ contract MyToken is IERC20  {
         balanceOf[recipient] += amount;
         emit Transfer(msg.sender, recipient, amount);
         return true;
-    }
+    } 
 
     function approve(address spender, uint256 amount) external returns (bool) {
         allowance[msg.sender][spender] = amount;
