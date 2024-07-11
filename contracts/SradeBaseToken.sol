@@ -7,8 +7,8 @@ import {Governed} from "./Governed.sol";
 
 contract StradeBaseToken is ERC20, Governed {
     uint8 private _decimals;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+    uint256 private _totalSupply;
+    
 
     mapping(address => bool) private _burners;
     mapping(address => bool) private _minters;
@@ -16,7 +16,7 @@ contract StradeBaseToken is ERC20, Governed {
     event Approval(address indexed spender, uint256 value);
     event MinterAdded(address indexed account);
     event MinterRemoved(address indexed account);
-    event Transfer(address indexed from, address indexed to, uint256 value);
+   
 
     constructor(uint256 initialSupply) ERC20("StradeBaseToken", "SBTS") {
         _decimals = 18;
@@ -25,7 +25,7 @@ contract StradeBaseToken is ERC20, Governed {
         _initialize(msg.sender);
         addMinter(msg.sender);
 
-        mint(msg.sender, initialSupply);
+        _mint(msg.sender, initialSupply);
     }
 
     modifier onlyBurner() {
@@ -50,11 +50,11 @@ contract StradeBaseToken is ERC20, Governed {
         _minters[account] = true;
     }
 
-    function isBurner(address account) public returns (bool) {
+    function isBurner(address account) view public returns (bool) {
         return _burners[account];
     }
 
-    function isMinter(address account) public returns (bool) {
+    function isMinter(address account) view public returns (bool) {
         return _minters[account];
     }
 
