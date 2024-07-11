@@ -18,7 +18,7 @@ contract StradeBaseToken is ERC20, Governed {
     event MinterRemoved(address indexed account);
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-    constructor(uint256 initialSupply) ERC20("StradeBaseToken", "TRBX") {
+    constructor(uint256 initialSupply) ERC20("StradeBaseToken", "SBTS") {
         _decimals = 18;
         _totalSupply = initialSupply;
 
