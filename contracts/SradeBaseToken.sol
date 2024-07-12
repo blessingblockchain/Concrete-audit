@@ -29,12 +29,14 @@ contract StradeBaseToken is ERC20, Governed {
     }
 
     modifier onlyBurner() {
-        require(_burners[msg.sender], ERC20InvalidSender(msg.sender));
+        if(!_burners[msg.sender])
+         revert ERC20InvalidSender(msg.sender);
         _;
     }
 
     modifier onlyMinter() {
-        require(_minters[msg.sender], "Only _minters");
+        if(!_minters[msg.sender])
+         revert ERC20InvalidSender(msg.sender);
         _;
     }
 
@@ -63,7 +65,7 @@ contract StradeBaseToken is ERC20, Governed {
         emit Transfer(from, address(0), amount);
     }
 
-    function mint(address to, uint256 amount) external onlyMinter {
+    function mint(address to, uint256 amount) public onlyMinter {
         _mint(to, amount);
         emit Transfer(address(0), to, amount);
     }
