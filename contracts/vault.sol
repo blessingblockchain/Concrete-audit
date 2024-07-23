@@ -5,7 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Governed} from "./Governed.sol";
 
 contract Vault is Governed {
-    mapping(addres => bool) private _rewardDelegators;
+    mapping(address => bool) internal _rewardDelegators;
 
     // reward token which vault would hold some balance of
     IERC20 _token;
@@ -33,6 +33,10 @@ contract Vault is Governed {
         );
 
         _;
+    }
+
+    function rewardDelegator(address _account) external view returns (bool) {
+        return _rewardDelegators[_account];
     }
 
     function addRewardDelegator(address _delegator) external onlyGovernor {

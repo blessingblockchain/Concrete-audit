@@ -22,7 +22,7 @@ contract Staking {
         uint256 timestamp;
     }
 
-    uint8 private _stakingDuration = 60 days;
+    uint32 private _stakingDuration = 60 days;
 
     IERC20 private _token;
 
@@ -50,23 +50,30 @@ contract Staking {
 
     constructor(address _tokenAddress, address _vaultAddress) {
         _token = IERC20(_tokenAddress);
-        
+
         _vault = Vault(_vaultAddress);
     }
 
     // we need to ensure that address(this) has been set as a rewardDelegator in Vault so that users can earn rewards after staking for `stakingduration`
     modifier isRewardDelegator() {
-        require(_vault._rewardDelegators[address(this)], "Deployer should set address(this) to be a reward delegator in Vault contract");
+        require(
+            _vault.rewardDelegator(address(this)),
+            "Deployer should set address(this) to be a reward delegator in Vault contract"
+        );
 
         _;
     }
 
-    function stakingDuration() public view returns(uint256) {
-        return _stakingDuration
+    function stakingDuration() public view returns (uint256) {
+        return _stakingDuration;
     }
 
-    function stakesInfo(address artist) public view returns (Stake) {
-        return _stakes[artist][msg.sender];
+    function stakesInfo(
+        address artist,
+        address user
+    ) public view returns (uint256, uint256) {
+        Stake memory userArtistStake = _stakes[artist][user];
+        return (userArtistStake.amount, userArtistStake.timestamp);
     }
 
     function artistTotalStakes(address artist) public view returns (uint256) {
@@ -77,7 +84,10 @@ contract Staking {
         @dev stakeToken
         after msg.sender approves this contract to spend `amount` of their ERC20, calls this function to stake the approved `amount` of tokens
     */
-    function stakeToken(address artist, uint256 amount) isRewardDelegator external {
+    function stakeToken(
+        address artist,
+        uint256 amount
+    ) external isRewardDelegator {
         require(amount > 0, "Amount must be greater than 0");
 
         require(
