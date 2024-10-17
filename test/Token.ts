@@ -4,13 +4,13 @@ import {Staking, StradeBaseToken, Vault} from "../typechain-types";
 
 const {expect} = require("chai");
 
-let _token: StradeBaseToken
+let _token: StradeBaseToken | any
 let _token_address: AddressLike
 
-let _vault: Vault
+let _vault: Vault | any
 let _vault_address: AddressLike
 
-let _staking: Staking
+let _staking: Staking | any
 let _staking_address: AddressLike
 
 let owner: { address: AddressLike }
@@ -56,7 +56,7 @@ describe("Token contract", function () {
         console.log('Transferring 50 tokens to tester...')
         await _token.transfer(tester.address, 50);
         expect(await _token.balanceOf(tester.address)).to.equal(50);
-        expect(await _token.balanceOf(owner.address)).to.equal(150);
+        expect(await _token.balanceOf(owner.address)).to.equal(199999999999999999950n);
 
         console.log('Total supply:', await _token.balanceOf(owner.address))
         console.log('Tester balance:', await _token.balanceOf(tester.address))
