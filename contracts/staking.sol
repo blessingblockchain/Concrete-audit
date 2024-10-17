@@ -29,19 +29,17 @@ contract Staking {
     Vault private _vault;
 
     // artist => user => Stake tracker
-    mapping(address => mapping(address => Stake)) private _stakes;
+    mapping(address => Stake) private _stakes;
 
     // artist => totalStakes tracker
     mapping(address => uint256) private _artistTotalStakes;
 
     event StakeDeposited(
-        address indexed user,
         address indexed artist,
         uint256 amount
     );
 
     event StakeWithdrawn(
-        address indexed user,
         address indexed artist,
         uint256 amount
     );
@@ -68,11 +66,8 @@ contract Staking {
         return _stakingDuration;
     }
 
-    function stakesInfo(
-        address artist,
-        address user
-    ) public view returns (uint256, uint256) {
-        Stake memory userArtistStake = _stakes[artist][user];
+    function stakesInfo(address artist) public view returns (uint256, uint256) {
+        Stake memory userArtistStake = _stakes[artist];
         return (userArtistStake.amount, userArtistStake.timestamp);
     }
 
@@ -84,24 +79,21 @@ contract Staking {
         @dev stakeToken
         after msg.sender approves this contract to spend `amount` of their ERC20, calls this function to stake the approved `amount` of tokens
     */
-    function stakeToken(
-        address artist,
-        uint256 amount
-    ) external isRewardDelegator {
+    function stakeToken(address artist, uint256 amount) external isRewardDelegator {
         require(amount > 0, "Amount must be greater than 0");
 
         require(
-            _token.transferFrom(msg.sender, address(this), amount),
+            _token.transferFrom(artist, address(this), amount),
             "Amount not approved by msg.sender for contract to transfer"
         );
 
-        _stakes[artist][msg.sender] = Stake(amount, block.timestamp);
+        _stakes[artist] = Stake(amount, block.timestamp);
 
-        emit StakeDeposited(msg.sender, artist, amount);
+        emit StakeDeposited(artist, amount);
     }
 
     function withdrawToken(address artist) external {
-        Stake memory userStake = _stakes[artist][msg.sender];
+        Stake memory userStake = _stakes[artist];
 
         require(userStake.amount > 0, "No stake found");
 
@@ -112,9 +104,9 @@ contract Staking {
 
         uint256 amount = userStake.amount;
 
-        _stakes[artist][msg.sender].amount = 0;
+        _stakes[artist].amount = 0;
 
-        emit StakeWithdrawn(msg.sender, artist, amount);
+        emit StakeWithdrawn(artist, amount);
 
         require(_token.transfer(msg.sender, amount), "Token transfer failed");
 
