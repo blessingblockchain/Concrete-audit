@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Vault} from "./Vault.sol";
+import {Vault} from "./vault.sol";
 
 interface IERC20 {
     function transferFrom(
